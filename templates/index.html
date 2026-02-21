@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Book Tracking System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                        <rect x="8" y="6" width="24" height="28" rx="2" stroke="currentColor" stroke-width="2"/>
+                        <line x1="12" y1="14" x2="28" y2="14" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="12" y1="19" x2="28" y2="19" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="12" y1="24" x2="22" y2="24" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                    <h1>Library Archive</h1>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalBooks">0</span>
+                        <span class="stat-label">Total Books</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="availableBooks">0</span>
+                        <span class="stat-label">Available</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="borrowedBooks">0</span>
+                        <span class="stat-label">Borrowed</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav class="nav">
+                    <button class="nav-btn active" data-view="dashboard">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <rect x="2" y="2" width="7" height="7" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="11" y="2" width="7" height="7" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="2" y="11" width="7" height="7" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="11" y="11" width="7" height="7" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        Dashboard
+                    </button>
+                    <button class="nav-btn" data-view="add">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <line x1="10" y1="4" x2="10" y2="16" stroke="currentColor" stroke-width="1.5"/>
+                            <line x1="4" y1="10" x2="16" y2="10" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        Add Book
+                    </button>
+                    <button class="nav-btn" data-view="search">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+                            <line x1="13" y1="13" x2="17" y2="17" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        Search Books
+                    </button>
+                    <button class="nav-btn" data-view="borrow">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M4 10C4 6.686 6.686 4 10 4C13.314 4 16 6.686 16 10C16 13.314 13.314 16 10 16C6.686 16 4 13.314 4 10Z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M10 7V10L12.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        Borrow/Return
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="content">
+                <!-- Dashboard View -->
+                <section class="view active" id="dashboard">
+                    <div class="view-header">
+                        <h2>Book Collection</h2>
+                        <div class="filter-group">
+                            <select id="filterStatus" class="select-input">
+                                <option value="all">All Books</option>
+                                <option value="available">Available</option>
+                                <option value="borrowed">Borrowed</option>
+                            </select>
+                            <select id="sortBy" class="select-input">
+                                <option value="title">Sort by Title</option>
+                                <option value="author">Sort by Author</option>
+                                <option value="date">Sort by Date Added</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="books-grid" id="booksGrid">
+                        <!-- Books will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Add Book View -->
+                <section class="view" id="add">
+                    <div class="view-header">
+                        <h2>Add New Book</h2>
+                    </div>
+                    <form id="addBookForm" class="form-card">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="bookTitle">Book Title</label>
+                                <input type="text" id="bookTitle" name="title" required placeholder="Enter book title">
+                            </div>
+                            <div class="form-group">
+                                <label for="bookAuthor">Author</label>
+                                <input type="text" id="bookAuthor" name="author" required placeholder="Enter author name">
+                            </div>
+                            <div class="form-group">
+                                <label for="bookISBN">ISBN</label>
+                                <input type="text" id="bookISBN" name="isbn" required placeholder="Enter ISBN number">
+                            </div>
+                            <div class="form-group">
+                                <label for="bookGenre">Genre</label>
+                                <select id="bookGenre" name="genre" required>
+                                    <option value="">Select genre</option>
+                                    <option value="Fiction">Fiction</option>
+                                    <option value="Non-Fiction">Non-Fiction</option>
+                                    <option value="Science">Science</option>
+                                    <option value="History">History</option>
+                                    <option value="Biography">Biography</option>
+                                    <option value="Technology">Technology</option>
+                                    <option value="Philosophy">Philosophy</option>
+                                    <option value="Art">Art</option>
+                                    <option value="Poetry">Poetry</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="bookPublisher">Publisher</label>
+                                <input type="text" id="bookPublisher" name="publisher" placeholder="Enter publisher name">
+                            </div>
+                            <div class="form-group">
+                                <label for="bookYear">Publication Year</label>
+                                <input type="number" id="bookYear" name="year" placeholder="YYYY" min="1000" max="2024">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookDescription">Description</label>
+                            <textarea id="bookDescription" name="description" rows="4" placeholder="Brief description of the book"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Add Book to Collection</button>
+                            <button type="reset" class="btn btn-secondary">Clear Form</button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Search View -->
+                <section class="view" id="search">
+                    <div class="view-header">
+                        <h2>Search Books</h2>
+                    </div>
+                    <div class="search-container">
+                        <div class="search-bar">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+                                <line x1="13" y1="13" x2="17" y2="17" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                            <input type="text" id="searchInput" placeholder="Search by title, author, ISBN, or genre...">
+                        </div>
+                        <div class="search-results" id="searchResults">
+                            <p class="empty-state">Enter a search term to find books</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Borrow/Return View -->
+                <section class="view" id="borrow">
+                    <div class="view-header">
+                        <h2>Borrow & Return</h2>
+                    </div>
+                    <div class="borrow-container">
+                        <form id="borrowForm" class="form-card">
+                            <h3>Borrow a Book</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="borrowISBN">Book ISBN</label>
+                                    <input type="text" id="borrowISBN" name="isbn" required placeholder="Enter ISBN">
+                                </div>
+                                <div class="form-group">
+                                    <label for="borrowerName">Borrower Name</label>
+                                    <input type="text" id="borrowerName" name="borrower" required placeholder="Enter borrower name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="borrowDate">Borrow Date</label>
+                                    <input type="date" id="borrowDate" name="date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="returnDate">Expected Return Date</label>
+                                    <input type="date" id="returnDate" name="return_date" required>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Process Borrowing</button>
+                            </div>
+                        </form>
+
+                        <form id="returnForm" class="form-card">
+                            <h3>Return a Book</h3>
+                            <div class="form-group">
+                                <label for="returnISBN">Book ISBN</label>
+                                <input type="text" id="returnISBN" name="isbn" required placeholder="Enter ISBN to return">
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Process Return</button>
+                            </div>
+                        </form>
+
+                        <div class="borrowed-list" id="borrowedList">
+                            <h3>Currently Borrowed Books</h3>
+                            <div id="borrowedItems">
+                                <!-- Borrowed books will be listed here -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // API Base URL
+        const API_URL = 'http://localhost:5000/api';
+
+        // Navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const view = btn.dataset.view;
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(view).classList.add('active');
+            });
+        });
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Load books
+        async function loadBooks() {
+            try {
+                const response = await fetch(`${API_URL}/books`);
+                const books = await response.json();
+                displayBooks(books);
+                updateStats(books);
+            } catch (error) {
+                showToast('Failed to load books', 'error');
+            }
+        }
+
+        // Display books
+        function displayBooks(books) {
+            const grid = document.getElementById('booksGrid');
+            if (books.length === 0) {
+                grid.innerHTML = '<p class="empty-state">No books in the collection yet</p>';
+                return;
+            }
+            grid.innerHTML = books.map(book => `
+                <div class="book-card ${book.status === 'borrowed' ? 'borrowed' : ''}">
+                    <div class="book-header">
+                        <span class="book-genre">${book.genre || 'General'}</span>
+                        <span class="book-status status-${book.status}">${book.status || 'available'}</span>
+                    </div>
+                    <h3 class="book-title">${book.title}</h3>
+                    <p class="book-author">by ${book.author}</p>
+                    <div class="book-details">
+                        <span><strong>ISBN:</strong> ${book.isbn}</span>
+                        ${book.publisher ? `<span><strong>Publisher:</strong> ${book.publisher}</span>` : ''}
+                        ${book.year ? `<span><strong>Year:</strong> ${book.year}</span>` : ''}
+                    </div>
+                    ${book.description ? `<p class="book-description">${book.description}</p>` : ''}
+                    ${book.borrower ? `<div class="borrower-info"><strong>Borrowed by:</strong> ${book.borrower}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Update statistics
+        function updateStats(books) {
+            document.getElementById('totalBooks').textContent = books.length;
+            document.getElementById('availableBooks').textContent = books.filter(b => b.status === 'available').length;
+            document.getElementById('borrowedBooks').textContent = books.filter(b => b.status === 'borrowed').length;
+        }
+
+        // Add book form
+        document.getElementById('addBookForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const book = Object.fromEntries(formData);
+            try {
+                const response = await fetch(`${API_URL}/books`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(book)
+                });
+                if (response.ok) {
+                    showToast('Book added successfully!');
+                    e.target.reset();
+                    loadBooks();
+                }
+            } catch (error) {
+                showToast('Failed to add book', 'error');
+            }
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', async (e) => {
+            const query = e.target.value.trim();
+            const results = document.getElementById('searchResults');
+            if (query.length < 2) {
+                results.innerHTML = '<p class="empty-state">Enter at least 2 characters to search</p>';
+                return;
+            }
+            try {
+                const response = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}`);
+                const books = await response.json();
+                if (books.length === 0) {
+                    results.innerHTML = '<p class="empty-state">No books found</p>';
+                } else {
+                    results.innerHTML = books.map(book => `
+                        <div class="search-result-item">
+                            <div class="search-result-header">
+                                <h4>${book.title}</h4>
+                                <span class="book-status status-${book.status}">${book.status}</span>
+                            </div>
+                            <p class="book-author">${book.author}</p>
+                            <p class="book-isbn">ISBN: ${book.isbn}</p>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                results.innerHTML = '<p class="empty-state">Search failed</p>';
+            }
+        });
+
+        // Borrow form
+        document.getElementById('borrowForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            try {
+                const response = await fetch(`${API_URL}/borrow`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (response.ok) {
+                    showToast('Book borrowed successfully!');
+                    e.target.reset();
+                    loadBooks();
+                    loadBorrowedBooks();
+                } else {
+                    showToast('Failed to borrow book', 'error');
+                }
+            } catch (error) {
+                showToast('Failed to borrow book', 'error');
+            }
+        });
+
+        // Return form
+        document.getElementById('returnForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const isbn = e.target.isbn.value;
+            try {
+                const response = await fetch(`${API_URL}/return`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isbn })
+                });
+                if (response.ok) {
+                    showToast('Book returned successfully!');
+                    e.target.reset();
+                    loadBooks();
+                    loadBorrowedBooks();
+                } else {
+                    showToast('Failed to return book', 'error');
+                }
+            } catch (error) {
+                showToast('Failed to return book', 'error');
+            }
+        });
+
+        // Load borrowed books
+        async function loadBorrowedBooks() {
+            try {
+                const response = await fetch(`${API_URL}/borrowed`);
+                const books = await response.json();
+                const container = document.getElementById('borrowedItems');
+                if (books.length === 0) {
+                    container.innerHTML = '<p class="empty-state">No books currently borrowed</p>';
+                } else {
+                    container.innerHTML = books.map(book => `
+                        <div class="borrowed-item">
+                            <div><strong>${book.title}</strong> by ${book.author}</div>
+                            <div>Borrower: ${book.borrower}</div>
+                            <div>Due: ${book.return_date || 'N/A'}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Failed to load borrowed books');
+            }
+        }
+
+        // Initialize
+        loadBooks();
+        loadBorrowedBooks();
+        document.getElementById('borrowDate').valueAsDate = new Date();
+        const returnDate = new Date();
+        returnDate.setDate(returnDate.getDate() + 14);
+        document.getElementById('returnDate').valueAsDate = returnDate;
+    </script>
+</body>
+</html>
